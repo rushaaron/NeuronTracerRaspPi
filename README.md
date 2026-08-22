@@ -60,30 +60,43 @@ docker run --rm -p 8080:8080 neurontracer
 
 ## Cloudflare tunnel
 
-The compose file expects a named tunnel and the credentials that go with it, mounted from the
-host the same way the other stacks on this Pi do it.
+`cloudflared/config.yml` is checked into the repo and already points at `neurontracer.com` and
+its tunnel, so `git pull` plus `docker compose up` is enough on a Pi that already has the
+tunnel's credentials in place. Nothing in that file is secret -- the tunnel ID is already public
+in DNS as `<tunnel>.cfargotunnel.com`, and it carries no keys.
+
+What *does* stay off git, on the Pi only, is `cert.pem` and the tunnel's `<id>.json` (the actual
+credentials). Deliberately kept in their own directory, separate from any other tunnel on the
+same Pi, so two projects sharing a Pi can never reuse each other's Cloudflare authorization by
+accident:
 
 ```bash
-cloudflared tunnel login
-cloudflared tunnel create neurontracer
-cloudflared tunnel route dns neurontracer neurontracer.example.com
+mkdir -p ~/.cloudflared-neurontracer
+
+docker run --rm -it \
+  -v ~/.cloudflared-neurontracer:/home/nonroot/.cloudflared \
+  cloudflare/cloudflared:2026.2.0 \
+  tunnel login
+# opens a URL -- log in and pick neurontracer.com
+
+docker run --rm -it \
+  -v ~/.cloudflared-neurontracer:/home/nonroot/.cloudflared \
+  cloudflare/cloudflared:2026.2.0 \
+  tunnel create neurontracer
+
+docker run --rm -it \
+  -v ~/.cloudflared-neurontracer:/home/nonroot/.cloudflared \
+  cloudflare/cloudflared:2026.2.0 \
+  tunnel route dns neurontracer neurontracer.com
 ```
 
-Then put this in `~/.cloudflared/config.yml` on the Pi. The `credentials-file` path is the path
-*inside* the cloudflared container, not on the host:
+`tunnel create` prints a tunnel ID and writes `<id>.json` into that directory. Put the same ID
+into `cloudflared/config.yml`'s `tunnel:` and `credentials-file:` fields (the current committed
+file already has the one already in production).
 
-```yaml
-tunnel: <tunnel-uuid>
-credentials-file: /home/nonroot/.cloudflared/<tunnel-uuid>.json
-
-ingress:
-  - hostname: neurontracer.example.com
-    service: http://neurontracer:8080
-  - service: http_status:404
-```
-
-Set `TUNNEL_NAME` and `CLOUDFLARED_DIR` in `.env` if your tunnel name or credentials directory
-differ from the defaults (`neurontracer` and `/home/rushpi/.cloudflared`).
+Only needed once per Pi. After that, `cp .env.example .env` already points `CLOUDFLARED_DIR` at
+`~/.cloudflared-neurontracer`, and `docker compose up -d --build` picks the credentials up from
+there. Override `CLOUDFLARED_DIR` in `.env` if you put them somewhere else.
 
 The cloudflared container here is named `neurontracer-cloudflared`, so it will not collide with
 the `cloudflared` container the recipes stack already runs.

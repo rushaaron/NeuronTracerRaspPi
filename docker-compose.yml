@@ -25,9 +25,12 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:2026.2.0
     container_name: neurontracer-cloudflared
-    command: tunnel run ${TUNNEL_NAME:-neurontracer}
+    # config.yml is checked into the repo (it carries no secrets); the credentials
+    # directory below lives outside the repo entirely, on the Pi only.
+    command: tunnel --config /etc/cloudflared/config.yml run
     volumes:
-      - ${CLOUDFLARED_DIR:-/home/rushpi/.cloudflared}:/home/nonroot/.cloudflared
+      - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+      - ${CLOUDFLARED_DIR:-/home/rushpi/.cloudflared-neurontracer}:/home/nonroot/.cloudflared:ro
     depends_on:
       - neurontracer
     restart: unless-stopped

@@ -1,0 +1,12 @@
+# Tunnel routing for neurontracer.com. Not secret -- the tunnel ID is already public in
+# DNS as <tunnel>.cfargotunnel.com, and this file carries no credentials.
+#
+# The actual credentials (cert.pem and the tunnel's <id>.json) stay out of git entirely,
+# on the Pi at the path CLOUDFLARED_DIR points to. See README.md for how they got there.
+tunnel: 107b5d76-4160-4cda-8703-38bbfdaaefb6
+credentials-file: /home/nonroot/.cloudflared/107b5d76-4160-4cda-8703-38bbfdaaefb6.json
+
+ingress:
+  - hostname: neurontracer.com
+    service: http://neurontracer:8080
+  - service: http_status:404
