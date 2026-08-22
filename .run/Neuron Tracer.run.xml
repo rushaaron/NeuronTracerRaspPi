@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Neuron Tracer" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.neurontracer.Main" />
+    <module name="neuron-tracer" />
+    <option name="VM_PARAMETERS" value="-Djava.awt.headless=true -XX:+UseSerialGC" />
+    <envs>
+      <env name="PORT" value="8080" />
+      <env name="TRACE_CONCURRENCY" value="2" />
+      <env name="TRACE_TIMEOUT_SECONDS" value="600" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
