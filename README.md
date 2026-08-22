@@ -39,9 +39,6 @@ src/main/java/com/neurontracer/
 src/main/resources/web/    the single page front end, served from inside the jar
 ```
 
-`NeuronTracing/` and `TraceFrontEnd/` are the two original repos. Everything in them has been
-ported into `src/`; they are kept only for reference and can be deleted.
-
 ## Running it on the Pi
 
 ```bash
