@@ -1,0 +1,33 @@
+services:
+  neurontracer:
+    build: .
+    image: neurontracer:latest
+    container_name: neurontracer
+    expose:
+      - "8080"
+    environment:
+      - PORT=8080
+      # Tuning knobs. The defaults suit a Raspberry Pi; see README.md for the full list.
+      - MAX_UPLOAD_MB=${MAX_UPLOAD_MB:-25}
+      - MAX_IMAGE_MEGAPIXELS=${MAX_IMAGE_MEGAPIXELS:-40}
+      - TRACE_CONCURRENCY=${TRACE_CONCURRENCY:-2}
+      - TRACE_TIMEOUT_SECONDS=${TRACE_TIMEOUT_SECONDS:-300}
+      - RESULT_RETENTION_SECONDS=${RESULT_RETENTION_SECONDS:-600}
+      - JAVA_OPTS=-XX:MaxRAMPercentage=70 -XX:+UseSerialGC -Djava.awt.headless=true
+    # Nothing is ever written to disk, so the filesystem can stay read only.
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.2.0
+    container_name: neurontracer-cloudflared
+    command: tunnel run ${TUNNEL_NAME:-neurontracer}
+    volumes:
+      - ${CLOUDFLARED_DIR:-/home/rushpi/.cloudflared}:/home/nonroot/.cloudflared
+    depends_on:
+      - neurontracer
+    restart: unless-stopped

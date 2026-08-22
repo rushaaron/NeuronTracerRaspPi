@@ -1,0 +1,13 @@
+# Normalise line endings to LF in the repository.
+* text=auto
+
+# These are read by Linux tooling, so they must keep LF even when checked out on Windows.
+Dockerfile    text eol=lf
+*.sh          text eol=lf
+*.yml         text eol=lf
+
+# Binary assets.
+*.jpg  binary
+*.jpeg binary
+*.png  binary
+*.ico  binary

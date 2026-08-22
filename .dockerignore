@@ -1,0 +1,17 @@
+# Build output
+target/
+out/
+
+# Original single-purpose repos, kept for reference only
+NeuronTracing/
+TraceFrontEnd/
+
+# Tooling and local files
+.git/
+.gitignore
+.idea/
+*.iml
+.vscode/
+.env
+docker-compose.yml
+README.md

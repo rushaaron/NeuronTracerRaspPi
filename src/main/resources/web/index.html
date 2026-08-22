@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Neuron Tracer</title>
+    <meta name="description" content="Trace sensory neuron images and get a NeuronJ data file you can open in Fiji.">
+    <link rel="icon" href="/img/favicon.jpg" type="image/jpeg">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="page-header">
+    <h1>Neuron Tracer</h1>
+    <p class="tagline">A head start on hand tracing, for the NeuronJ plugin for Fiji.</p>
+</header>
+
+<main>
+    <section class="intro">
+        <p>
+            Upload an image of a sensory neuron and this will attempt to trace it and gather statistics on
+            the result. You get back an NDF file you can open in NeuronJ to continue where the tracer left
+            off, plus JPEGs that show what it found.
+        </p>
+        <p class="note">
+            Images are traced in memory and thrown away as soon as the result is sent back. Nothing is stored
+            on the server.
+        </p>
+    </section>
+
+    <section class="steps">
+        <h2>How to use it</h2>
+        <ol>
+            <li>
+                For best results, fill in the cell body with a pink color. Otherwise the tracer will try to
+                detect it automatically, but if it is not dark enough the results may vary.
+            </li>
+            <li>Choose a sensory neuron image. See the examples further down the page.</li>
+            <li>Adjust the tuning values if you need to, then press <strong>Trace image</strong>.</li>
+            <li>Check the preview to see how the trace turned out.</li>
+            <li>Download the archive to get the traced images and the NDF file.</li>
+        </ol>
+    </section>
+
+    <section class="workbench">
+        <form id="trace-form" class="panel">
+            <h2>Trace an image</h2>
+
+            <div class="field">
+                <label for="image">Neuron image</label>
+                <input type="file" id="image" name="image" accept="image/jpeg,image/png" required>
+                <p class="hint" id="file-name">No file chosen yet.</p>
+            </div>
+
+            <div class="field">
+                <label for="branchShade">RGB shade of all branches</label>
+                <input type="number" id="branchShade" name="branchShade" min="5" max="254" step="1" value="230">
+                <p class="hint">Higher values look at lighter pixels, but may be less accurate.</p>
+            </div>
+
+            <div class="field">
+                <label for="cellBranchShade">RGB shade of branches at the cell body</label>
+                <input type="number" id="cellBranchShade" name="cellBranchShade" min="5" max="254" step="1" value="220">
+                <p class="hint">Raise this if branches leaving the cell body are being missed.</p>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label for="xOffset">X offset</label>
+                    <input type="number" id="xOffset" name="xOffset" min="5" max="100" step="1" value="40">
+                </div>
+                <div class="field">
+                    <label for="yOffset">Y offset</label>
+                    <input type="number" id="yOffset" name="yOffset" min="5" max="100" step="1" value="40">
+                </div>
+            </div>
+            <p class="hint">How far from the cell body the search for starting branches begins.</p>
+
+            <div class="field">
+                <label for="ignore">Stem to ignore (the axon)</label>
+                <select id="ignore" name="ignore">
+                    <option value="" selected>Include every side</option>
+                    <option value="N">North &mdash; top</option>
+                    <option value="S">South &mdash; bottom</option>
+                    <option value="E">East &mdash; right</option>
+                    <option value="W">West &mdash; left</option>
+                </select>
+            </div>
+
+            <button type="submit" id="submit-button" class="button primary">Trace image</button>
+            <button type="reset" id="reset-button" class="button subtle">Reset values</button>
+        </form>
+
+        <div class="panel results" id="results">
+            <h2>Result</h2>
+            <p class="status" id="status" role="status" aria-live="polite">Upload an image to get started.</p>
+
+            <img id="preview" class="preview" alt="Preview of the traced neuron" hidden>
+
+            <dl class="stats" id="stats" hidden>
+                <div><dt>Branches</dt><dd id="stat-branches">&mdash;</dd></div>
+                <div><dt>Traced pixels</dt><dd id="stat-pixels">&mdash;</dd></div>
+                <div><dt>Total length</dt><dd id="stat-microns">&mdash;</dd></div>
+                <div><dt>Average branch</dt><dd id="stat-average">&mdash;</dd></div>
+            </dl>
+
+            <a id="download" class="button primary" download hidden>Download traced files</a>
+        </div>
+    </section>
+
+    <section class="examples">
+        <h2>Examples</h2>
+        <p>
+            A high contrast image where the cell body is the same shade as the branches needs the cell body
+            filled in with pink first.
+        </p>
+        <figure>
+            <img src="/img/example-filled-cell.jpg" alt="High contrast neuron with the cell body filled in pink">
+            <figcaption>A high contrast image with the cell body filled in.</figcaption>
+        </figure>
+
+        <div class="example-grid">
+            <figure>
+                <img src="/img/example-original.jpg" alt="Original neuron image before any edits">
+                <figcaption>1. The original image.</figcaption>
+            </figure>
+            <figure>
+                <img src="/img/example-pink.jpg" alt="The same neuron with its cell body filled in pink">
+                <figcaption>2. Cell body filled in pink.</figcaption>
+            </figure>
+            <figure>
+                <img src="/img/example-traced.jpg" alt="Traced branches drawn over the original image">
+                <figcaption>3. Branches traced over the original.</figcaption>
+            </figure>
+            <figure>
+                <img src="/img/example-traced-white.jpg" alt="Traced branches drawn on a white background">
+                <figcaption>4. The same trace on white.</figcaption>
+            </figure>
+        </div>
+    </section>
+</main>
+
+<footer class="page-footer">
+    <p>Neuron Tracer &mdash; results are a starting point, always check them in NeuronJ.</p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>
